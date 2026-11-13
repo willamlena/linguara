@@ -38,6 +38,29 @@
       },
       sample: 'Good morning! How are you?', sample2: 'Thank you very much!', hello: 'Hello! Happy learning!', bye: 'See you tomorrow!', bye2: 'See you soon!',
     },
+    de: {
+      code: 'de', bcp: 'de-DE', voice: /^de([-_]|$)/i, voiceName: /deutsch|german/i, prefer: /DE|Germany|Deutschland|Anna|Helena|Markus/i, flag: '🇩🇪',
+      key: 'linguara-deutsch.v1', sources: ['id', 'en'],
+      name: { id: 'bahasa Jerman', en: 'German' }, adj: { id: 'Jerman', en: 'German' }, lfull: { id: 'Jerman (Jerman)', en: 'German (Germany)' }, iosVoice: 'Anna',
+      greet: ['Guten Morgen!', 'Guten Tag!', 'Guten Tag!', 'Guten Abend!'], welcome: 'Willkommen! 👋',
+      praise: ['Super!', 'Richtig!', 'Toll!'], great: 'Sehr gut!', good: 'Gut gemacht!', keep: 'Weiter so!',
+      override: {
+        'Ding, Ort oder Person – z. B. kelapa (Kokosnuss), pantai (Strand)': 'Ding, Ort oder Person – mit Artikel, z. B. der Strand, die Kokosnuss',
+        'Eigenschaft – z. B. segar (frisch), lucu (süß, lustig)': 'Eigenschaft – z. B. frisch, gemütlich',
+        'Tätigkeit – Deutsch bitte in der Grundform, z. B. „schwimmen“': 'Tätigkeit – in der Grundform, z. B. schwimmen',
+        'z. B. kelapa': 'z. B. die Kokosnuss',
+        'z. B. Saya mau minum air kelapa.': 'z. B. Ich trinke gern Kokoswasser.',
+        'z. B. Ich möchte Kokoswasser trinken.': 'z. B. Saya suka minum air kelapa.',
+        'Alltag': 'Umgangssprache',
+        'Alltagsformen zeigen': 'Umgangssprachliche Formen zeigen',
+        'z. B. tidak → nggak, sudah → udah': 'z. B. habe → hab, nein → nee',
+        'Wo bist du in Indonesien?': 'In welcher Stadt lebst du?',
+        'z. B. Bali, Ubud, Jakarta': 'z. B. Wien, Berlin, Zürich',
+        'B1–B2 · Leben in Indonesien, Beruf, Umgangssprache, Meinungen': 'B1–B2 · Leben im Ausland, Beruf, Umgangssprache, Meinungen',
+        'Du hast alle {n} Karten der Grundlagen gelernt. Ab jetzt geht es mit <b>Level 2 – Fortgeschritten</b> weiter: Leben in Indonesien, Beruf, Umgangssprache und eigene Meinungen.': 'Du hast alle {n} Karten der Grundlagen gelernt. Ab jetzt geht es mit <b>Level 2 – Fortgeschritten</b> weiter: Leben im Ausland, Beruf, Umgangssprache und eigene Meinungen.',
+      },
+      sample: 'Guten Morgen! Wie geht es Ihnen?', sample2: 'Vielen Dank!', hello: 'Hallo! Viel Spaß beim Lernen!', bye: 'Bis morgen!', bye2: 'Bis bald!',
+    },
   };
   const readJSON = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
   const app0 = readJSON(APP_KEY) || {};
@@ -51,8 +74,9 @@
     if (TL.sources.length === 1) return TL.sources[0];
     const s = readJSON(TL.key);
     if (s && s.settings && TL.sources.includes(s.settings.lang)) return s.settings.lang;
-    if (s && s.cards && Object.keys(s.cards).length) return 'de';
     const nav = typeof navigator !== 'undefined' ? ((navigator.languages && navigator.languages[0]) || navigator.language || '') : '';
+    if (TARGET === 'de') return /^(id|in)\b/i.test(nav) ? 'id' : 'en';
+    if (s && s.cards && Object.keys(s.cards).length) return 'de';
     return !nav || /^de\b/i.test(nav) ? 'de' : 'en';
   })();
 
@@ -79,10 +103,10 @@
   const t = (s, vars) => {
     if (TL.override && TL.override[s]) s = TL.override[s];
     let r = s;
-    if (LANG === 'en') {
-      const D = window.UI_EN || {};
+    const D = LANG === 'en' ? window.UI_EN : LANG === 'id' ? window.UI_ID : null;
+    if (D) {
       if (Object.prototype.hasOwnProperty.call(D, s)) r = D[s];
-      else (window.__missingEN = window.__missingEN || new Set()).add(s);
+      else (window.__missingUI = window.__missingUI || new Set()).add(s);
     }
     const v = vars ? Object.assign({}, BASEVARS, vars) : BASEVARS;
     return r.replace(/\{(\w+)\}/g, (m, k) => (v[k] != null ? v[k] : m));
@@ -94,6 +118,52 @@
     window.LESSONS = window.LESSONS_ENGLISH || {};
     window.DIALOGS = window.DIALOGS_ENGLISH || [];
     window.DIALOG_GROUPS = window.DIALOG_GROUPS_ENGLISH || window.DIALOG_GROUPS;
+  }
+
+  // Deutschkurs: Inhalte stehen dreisprachig in den Dateien (Deutsch + Indonesisch + Englisch).
+  // Texte der Form „indonesisch ¦ englisch“ werden auf die Ausgangssprache reduziert.
+  if (TARGET === 'de') {
+    const SI = LANG === 'id' ? 0 : 1;
+    const pickL = s => (typeof s === 'string' && s.includes(' ¦ ') ? s.split(' ¦ ')[SI] : s);
+    const cells = l => l.split('|').map(x => (x || '').trim());
+    window.COURSE = (window.COURSE_GERMAN || []).map(u => Object.assign({}, u, {
+      title: pickL(u.title),
+      // Wort: deutsch | indonesisch | englisch | umgangssprachlich | Beispiel DE | Beispiel ID | Beispiel EN | Hinweis ID | Hinweis EN
+      // Satz: > deutsch | indonesisch | englisch | Hinweis ID | Hinweis EN
+      items: u.items.split('\n').map(raw => {
+        const l = raw.trim();
+        if (!l || l.startsWith('#')) return raw;
+        if (l.startsWith('>')) {
+          const f = cells(l.slice(1));
+          return '> ' + [f[0], f[1 + SI], (SI && f[4] === '=' ? f[3] : f[3 + SI]) || ''].join(' | ');
+        }
+        const f = cells(l);
+        // „=“ als englischer Hinweis: wie der indonesische (z. B. Mehrzahl „Pl. die Tische“)
+        const note = SI && f[8] === '=' ? f[7] : f[7 + SI];
+        return [f[0], f[1 + SI], f[3], f[4], f[5 + SI], note || ''].join(' | ');
+      }).join('\n'),
+    }));
+    const L = {};
+    Object.entries(window.LESSONS_GERMAN || {}).forEach(([k, g]) => {
+      L[k] = {
+        title: pickL(g.title),
+        body: typeof g.body === 'string' ? g.body : g.body[LANG],
+        quiz: (g.quiz || []).map(([q, opts, i, why]) => [pickL(q), opts.map(pickL), i, pickL(why)]),
+      };
+    });
+    window.LESSONS = L;
+    const pickKey = k => {
+      const i = k.indexOf('::');
+      return i < 0 ? k : k.slice(0, i) + ':: ' + pickL(k.slice(i + 2).trim());
+    };
+    window.DIALOGS = (window.DIALOGS_GERMAN || []).map(d => Object.assign({}, d, {
+      title: pickL(d.title), tags: d.tags.replace(' ¦ ', ' '), setting: pickL(d.setting), goal: pickL(d.goal), partner: pickL(d.partner),
+      steps: d.steps.map(s => Object.assign({}, s, {
+        pd: pickL(s.pd), n: pickL(s.n), task: pickL(s.task), tip: pickL(s.tip),
+        a: s.a && s.a.map(a => Object.assign({}, a, { md: pickL(a.md), k: a.k.map(pickKey) })),
+      })),
+    }));
+    window.DIALOG_GROUPS = (window.DIALOG_GROUPS_GERMAN || []).map(g => Object.assign({}, g, { title: pickL(g.title) }));
   }
 
   // Lerninhalte auf Englisch umstellen (Karten, Lektionen, Gespräche) – vor dem Aufbau des Kurses
@@ -163,7 +233,10 @@
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
   // Für Vergleiche: Kleinschreibung, keine Satzzeichen, Bindestrich = Leerzeichen
+  // Deutschkurs: Umlaute dürfen auch als ae/oe/ue/ss getippt werden (fehlen auf vielen Tastaturen)
+  const UML = { 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss' };
   const norm = s => String(s).toLowerCase().normalize('NFC')
+    .replace(/[äöüß]/g, c => (TARGET === 'de' ? UML[c] : c))
     .replace(/[‘’`´]/g, "'")
     .replace(/[-‐–—]/g, ' ')
     .replace(/[.,!?;:"„“”()…¿¡]/g, ' ')

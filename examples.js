@@ -102,6 +102,37 @@ const TEMPLATES_ENGLISH = {
     ["It isn't too {w}.", 'Es ist nicht allzu {d}.'],
   ],
 };
+// Deutschkurs: Satzbausteine [deutsch, indonesisch, englisch] ({w} = deutsches Wort mit Artikel,
+// {d} = Bedeutung). Nomen nur im Nominativ, damit der Artikel immer stimmt.
+const TEMPLATES_GERMAN = {
+  n: [
+    ['Wo ist {w}?', 'Di mana {d}?', 'Where is the {d}?'],
+    ['{W} ist sehr schön.', '{D} sangat bagus.', 'The {d} is very nice.'],
+    ['{W} ist dort drüben.', '{D} ada di sana.', 'The {d} is over there.'],
+    ['Ist {w} neu?', 'Apakah {d} baru?', 'Is the {d} new?'],
+    ['{W} gefällt mir.', 'Saya suka {d}.', 'I like the {d}.'],
+    ['{W} ist zu teuer.', '{D} terlalu mahal.', 'The {d} is too expensive.'],
+    ['Wie viel kostet {w}?', 'Berapa harga {d}?', 'How much is the {d}?'],
+    ['Hier ist {w}.', 'Ini {d}.', 'Here is the {d}.'],
+  ],
+  v: [
+    ['Ich möchte {w}.', 'Saya mau {d}.', "I'd like to {d}."],
+    ['Kannst du {w}?', 'Kamu bisa {d}?', 'Can you {d}?'],
+    ['Ich muss heute {w}.', 'Saya harus {d} hari ini.', 'I have to {d} today.'],
+    ['Wir können morgen {w}.', 'Kita bisa {d} besok.', 'We can {d} tomorrow.'],
+    ['Ich will nicht {w}.', 'Saya tidak mau {d}.', "I don't want to {d}."],
+    ['Willst du {w}?', 'Kamu mau {d}?', 'Do you want to {d}?'],
+    ['Lass uns {w}!', 'Ayo kita {d}!', "Let's {d}!"],
+  ],
+  a: [
+    ['Das ist sehr {w}.', 'Ini sangat {d}.', "It's very {d}."],
+    ['Das ist zu {w}.', 'Ini terlalu {d}.', "It's too {d}."],
+    ['Das ist nicht {w}.', 'Ini tidak {d}.', "That isn't {d}."],
+    ['Ist das {w}?', 'Apakah ini {d}?', 'Is it {d}?'],
+    ['Das ist ziemlich {w}.', 'Ini cukup {d}.', "It's quite {d}."],
+    ['Warum ist das so {w}?', 'Kenapa ini begitu {d}?', 'Why is it so {d}?'],
+  ],
+};
   const POS_LABEL = { n: t('Ding'), v: t('Tätigkeit'), a: t('Eigenschaft'), x: t('Ausdruck') };
 
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
@@ -142,6 +173,15 @@ const TEMPLATES_ENGLISH = {
       if (t.endsWith('ed')) stems.push(t.slice(0, -2), t.slice(0, -1));
       if (t.endsWith('ing')) stems.push(t.slice(0, -3), t.slice(0, -3) + 'e');
       if (t.endsWith('ly')) stems.push(t.slice(0, -2));
+      if (stems.some(x => x.length > 1 && K.has(x))) return true;
+    }
+    if (window.U.TARGET === 'de') {
+      // Deutsche Formen: Endungen (-e, -en, -er, -st, -t …) und Partizipien (ge…t / ge…en) zurück zur Grundform
+      const stems = [];
+      ['test', 'tet', 'ten', 'te', 'est', 'st', 'et', 'en', 'em', 'er', 'es', 'e', 'n', 's', 't'].forEach(e => {
+        if (t.length > e.length + 2 && t.endsWith(e)) { const b = t.slice(0, -e.length); stems.push(b, b + 'en', b + 'n', b + 'e'); }
+      });
+      if (t.length > 5 && t.startsWith('ge')) { const c = t.slice(2).replace(/(en|t)$/, ''); stems.push(c + 'en', c + 'n'); }
       if (stems.some(x => x.length > 1 && K.has(x))) return true;
     }
     return false;
@@ -223,7 +263,8 @@ const TEMPLATES_ENGLISH = {
       const r = analyse(e.text, forms, K);
       if (r.hasTarget) cands.push(Object.assign(r, { deHtml: esc(e.de), src: 'kurs' }));
     }
-    const tpl = card.custom && (window.U.TARGET === 'en' ? (TEMPLATES_ENGLISH[card.pos] || []).map(([a, b]) => [a, b, b]) : TEMPLATES[card.pos]);
+    const tpl = card.custom && (window.U.TARGET === 'en' ? (TEMPLATES_ENGLISH[card.pos] || []).map(([a, b]) => [a, b, b])
+      : window.U.TARGET === 'de' ? TEMPLATES_GERMAN[card.pos] : TEMPLATES[card.pos]);
     if (tpl) {
       const w = card.indo.split(' / ')[0].trim();
       const d0 = firstMeaning(card.de);

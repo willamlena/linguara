@@ -771,3 +771,12 @@ body.in-session { overflow: hidden; }
 .flag-btn { font-size: 22px; }
 .banner.move { background: var(--accent-soft); }
 .banner.move .btn { text-decoration: none; }
+
+/* ---------- Zugang mit Passwort ---------- */
+.gate { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; gap: 6px; }
+.gate-logo { width: 88px; height: 88px; border-radius: 22px; box-shadow: 0 6px 18px rgba(30,46,28,.14); margin-bottom: 10px; }
+.gate h1 { margin: 0; }
+.gate p { max-width: 300px; margin: 0 0 14px; }
+.gate-form { display: grid; gap: 10px; width: 100%; max-width: 300px; }
+.gate-form input { min-height: 48px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--surface); padding: 0 14px; font-size: 16px; text-align: center; }
+.gate-form input:focus-visible { outline: none; border-color: var(--accent); }

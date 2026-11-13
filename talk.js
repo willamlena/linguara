@@ -7,7 +7,7 @@
 
   // ---------- Profil ----------
   const OPTIONS = {
-    asal: [['Austria', 'Österreich', 'Austria'], ['Jerman', 'Deutschland', 'Germany'], ['Swiss', 'der Schweiz', 'Switzerland'], ['Belanda', 'den Niederlanden', 'the Netherlands'],
+    asal: [['Indonesia', 'Indonesien', 'Indonesia'], ['Austria', 'Österreich', 'Austria'], ['Jerman', 'Deutschland', 'Germany'], ['Swiss', 'der Schweiz', 'Switzerland'], ['Belanda', 'den Niederlanden', 'the Netherlands'],
       ['Italia', 'Italien', 'Italy'], ['Inggris', 'England', 'England'], ['Amerika', 'Amerika', 'America'], ['Australia', 'Australien', 'Australia']],
     kerja: [['karyawan kantor', 'Büroangestellte(r)', 'office worker'], ['manajer', 'Manager(in)', 'manager'], ['guru', 'Lehrer(in)', 'teacher'], ['dokter', 'Arzt/Ärztin', 'doctor'],
       ['perawat', 'Pflegekraft', 'nurse'], ['insinyur', 'Ingenieur(in)', 'engineer'], ['desainer', 'Designer(in)', 'designer'], ['arsitek', 'Architekt(in)', 'architect'],
@@ -18,14 +18,25 @@
     pasanganRel: [['suami', 'Mann', 'husband'], ['istri', 'Frau', 'wife'], ['pacar', 'Partner(in)', 'partner'], ['tunangan', 'Verlobte(r)', 'fiancé(e)']],
     anrede: [['perempuan', 'als Frau – „Bu“, „Mbak“', 'as a woman – “Bu”, “Mbak”'], ['laki-laki', 'als Mann – „Pak“, „Mas“', 'as a man – “Pak”, “Mas”'], ['', 'neutral – „Kak“', 'neutral – “Kak”']],
   };
+  // Deutschkurs: die Angabe bestimmt die Berufsbezeichnung (Lehrerin / Lehrer)
+  if (window.U.TARGET === 'de') OPTIONS.anrede = [['perempuan', 'weiblich', 'female – e.g. „Lehrerin“', 'perempuan – mis. „Lehrerin“'], ['laki-laki', 'männlich', 'male – e.g. „Lehrer“', 'laki-laki – mis. „Lehrer“'], ['', 'neutral', 'neutral', 'netral']];
   const FALLBACK = {
     nama: 'Anna', asal: 'Jerman', asalDe: 'Deutschland', kota: 'Bali', kerja: 'karyawan kantor', kerjaDe: 'Büroangestellte(r)',
     hobi: 'jalan-jalan', hobiDe: 'Reisen', pasangan: 'Budi', pasanganRel: 'pacar', pasanganRelDe: 'Partner(in)',
   };
 
   // Bezeichnung einer Option in der Sprache der App
-  const label = o => (LANG === 'en' ? o[2] : o[1]);
+  const label = o => (LANG === 'en' ? o[2] : LANG === 'id' ? (o[3] || o[0]) : o[1]);
   if (LANG === 'en') Object.assign(FALLBACK, { asalDe: 'Germany', kerjaDe: 'office worker', hobiDe: 'travelling', pasanganRelDe: 'partner' });
+  if (LANG === 'id') Object.assign(FALLBACK, { asalDe: 'Indonesia', kerjaDe: 'karyawan kantor', hobiDe: 'jalan-jalan', pasanganRelDe: 'pacar' });
+  if (window.U.TARGET === 'de') Object.assign(FALLBACK, { asal: 'Indonesia', nama: 'Dewi' });
+  if (window.U.TARGET === 'de' && LANG === 'en') FALLBACK.asalDe = 'Indonesia';
+  // Deutsche Berufsbezeichnung passend zur Angabe: „Lehrer(in)“ → „Lehrerin“ / „Lehrer“
+  const gendered = (w, g) => {
+    if (!g) return w;
+    if (w.includes('/')) return w.split('/')[g === 'perempuan' ? 1 : 0];
+    return g === 'perempuan' ? w.replace(/\(in\)$/, 'in').replace(/\(r\)$/, '') : w.replace(/\((in|r)\)$/, (m, x) => (x === 'r' ? 'r' : ''));
+  };
 
   function profile() {
     const p = Object.assign({}, St().S.profile || {});
@@ -46,6 +57,16 @@
       });
       if (out.asal === 'Netherlands') out.asal = 'the Netherlands';
     }
+    // Deutschkurs: die Wörter in der Lernsprache sind die deutschen Bezeichnungen
+    if (window.U.TARGET === 'de') {
+      const DE_FALLBACK = { asal: 'Indonesien', kota: 'Wien', kerja: 'Büroangestellte(r)', hobi: 'Reisen', pasangan: 'Budi', pasanganRel: 'Partner(in)' };
+      Object.keys(DE_FALLBACK).forEach(k => { if (!(p[k] || '').trim()) out[k] = DE_FALLBACK[k]; });
+      ['asal', 'kerja', 'hobi', 'pasanganRel'].forEach(k => {
+        const o = OPTIONS[k].find(x => x[0] === (p[k] || '').trim());
+        if (o) out[k] = o[1];
+      });
+      out.kerja = gendered(out.kerja, p.anrede);
+    }
     // „a/an“ vor dem Beruf (für englische Sätze wie „I'm an engineer“)
     out.kerjaA = (/^[aeiou]/i.test(out.kerja) ? 'an ' : 'a ') + out.kerja;
     out.hasPartner = !!(p.pasangan || '').trim();
@@ -58,7 +79,7 @@
 
   // ---------- Antworten prüfen ----------
   const SUF = ['nya', 'lah', 'kah', 'ku', 'mu', 'pun'];
-  const NUM_WORDS = new Set(['zero', 'oh', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'double', 'nol', 'kosong', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas', 'belas', 'puluh', 'ratus', 'ribu', 'juta']);
+  const NUM_WORDS = new Set(['zero', 'oh', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'double', 'nol', 'kosong', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas', 'belas', 'puluh', 'ratus', 'ribu', 'juta', 'null', 'eins', 'zwei', 'drei', 'vier', 'fünf', 'fuenf', 'sechs', 'sieben', 'acht', 'neun', 'zehn', 'elf', 'zwölf', 'zwoelf', 'zwo']);
 
   function parseKey(raw, prof) {
     let s = fill(raw, prof).trim();
@@ -126,9 +147,14 @@
   }
 
   // ---------- Gesprächsablauf ----------
-  const CONFUSED = window.U.TARGET === 'en' ? ['Sorry, could you say that again?', 'Sorry, what do you mean?', "Hmm, sorry, I don't quite follow."]
+  const CONFUSED = window.U.TARGET === 'de' ? ['Entschuldigung, wie bitte?', 'Wie meinst du das?', 'Hm, das habe ich leider nicht ganz verstanden.']
+    : window.U.TARGET === 'en' ? ['Sorry, could you say that again?', 'Sorry, what do you mean?', "Hmm, sorry, I don't quite follow."]
     : ['Maaf, bagaimana?', 'Maaf, maksudnya?', 'Hmm, maaf, saya kurang mengerti.'];
-  const CONFUSED_DE = window.U.TARGET === 'en'
+  const CONFUSED_DE = window.U.TARGET === 'de'
+    ? (LANG === 'id'
+      ? { 'Entschuldigung, wie bitte?': 'Maaf, bagaimana?', 'Wie meinst du das?': 'Maksudnya bagaimana?', 'Hm, das habe ich leider nicht ganz verstanden.': 'Hmm, maaf, saya kurang mengerti.' }
+      : { 'Entschuldigung, wie bitte?': 'Sorry, pardon?', 'Wie meinst du das?': 'What do you mean?', 'Hm, das habe ich leider nicht ganz verstanden.': "Hmm, sorry, I didn't quite understand that." })
+    : window.U.TARGET === 'en'
     ? { 'Sorry, could you say that again?': 'Entschuldigung, kannst du das noch mal sagen?', 'Sorry, what do you mean?': 'Entschuldigung, was meinst du?', "Hmm, sorry, I don't quite follow.": 'Hm, tut mir leid, ich komme nicht ganz mit.' }
     : LANG === 'en'
     ? { 'Maaf, bagaimana?': 'Sorry, pardon?', 'Maaf, maksudnya?': 'Sorry, what do you mean?', 'Hmm, maaf, saya kurang mengerti.': "Hmm, sorry, I don't quite understand." }
@@ -157,7 +183,7 @@
           <div class="s-top">
             <button class="icon-btn" data-s="quit" aria-label="${t('Beenden')}">${icon('x', 24)}</button>
             <div class="talk-title"><b>${esc(this.d.icon)} ${esc(this.d.title)}</b><span>${esc(fill(this.d.partner, this.prof))}</span></div>
-            <button class="toggle-btn${this.showDe ? ' on' : ''}" data-s="de" aria-label="${t('Übersetzung zeigen')}">${LANG === 'en' ? 'EN' : 'DE'}</button>
+            <button class="toggle-btn${this.showDe ? ' on' : ''}" data-s="de" aria-label="${t('Übersetzung zeigen')}">${LANG.toUpperCase()}</button>
             ${Listen.supported ? `<button class="toggle-btn${this.handsFree ? ' on' : ''}" data-s="hf" aria-label="${t('Freihand-Modus')}">${icon('headphones', 18)}</button>` : ''}
           </div>
           <div class="s-body"><div class="chat${this.showDe ? ' show-de' : ''}"></div></div>

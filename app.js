@@ -12,6 +12,7 @@
   let ask = { q: '', res: undefined }; // „Situation schildern“: letzte Eingabe und Ergebnis
   let installEvent = null;
   let swWaiting = null;
+  let gateOpen = false; // Passwortabfrage sichtbar – dann nichts anderes zeichnen
 
   const isAndroid = /Android/i.test(navigator.userAgent);
   // iPads melden sich als Mac – erkennbar an Touch-Unterstützung
@@ -20,7 +21,7 @@
 
   // ---------- Navigation ----------
   function render(keepScroll) {
-    if (session) return;
+    if (session || gateOpen) return;
     const y = keepScroll ? window.scrollY : 0;
     const views = { home: viewHome, course: viewCourse, trainer: viewTrainer, talk: viewTalk, words: viewWords, stats: viewStats, settings: viewSettings };
     app.innerHTML = `<main class="page page-${tab}">${views[tab]()}</main>${SUBPAGES.includes(tab) ? '' : nav()}`;
@@ -525,7 +526,11 @@
   }
 
   // ---------- Gespräche ----------
-  const ASK_EXAMPLES = window.U.TARGET === 'en'
+  const ASK_EXAMPLES = window.U.TARGET === 'de'
+    ? (LANG === 'id'
+      ? ['Saya mau membuka rekening bank', 'Wawancara kerja di Jerman', 'Saya harus ke dokter', 'Kapan pakai der, die, das?', 'Apa bahasa Jermannya kelapa?']
+      : ['I want to open a bank account', 'A job interview in German', 'I need to see a doctor', 'When do I use der, die or das?', 'What is coconut in German?'])
+    : window.U.TARGET === 'en'
     ? ['Im Hotel ist mein Zimmer zu laut', 'Mein Koffer ist am Flughafen nicht angekommen', 'Eine E-Mail an einen Kunden schreiben', 'Unterschied zwischen since und for', 'Was heißt Kokosnuss?']
     : LANG === 'en'
     ? ['I got the wrong food at a restaurant', 'I need to see a doctor', 'Talking to the landlord about the rent', 'Difference between tidak and bukan', 'What is coconut in Indonesian?']
@@ -633,7 +638,7 @@
       const before = ta.value;
       mic.classList.add('listening');
       Listen.start({
-        lang: LANG === 'en' ? 'en-US' : 'de-DE',
+        lang: LANG === 'en' ? 'en-US' : LANG === 'id' ? 'id-ID' : 'de-DE',
         onInterim: x => { if (x) ta.value = x; },
         onEnd: alts => {
           mic.classList.remove('listening');
@@ -757,7 +762,7 @@
   }
 
   // ---------- Statistik ----------
-  const WD = LANG === 'en' ? ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] : ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  const WD = LANG === 'en' ? ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] : LANG === 'id' ? ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'] : ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
   function viewStats() {
     const S = St.S;
     const vc = St.vocabCount();
@@ -869,10 +874,12 @@ const COURSE_OPTIONS = [
   { target: 'id', source: 'de' },
   { target: 'id', source: 'en' },
   { target: 'en', source: 'de' },
+  { target: 'de', source: 'id' },
+  { target: 'de', source: 'en' },
 ];
 // Ausgangssprachen heißen immer in ihrer eigenen Sprache, Lernsprachen in der gewählten Ausgangssprache
-const SOURCE_LANGS = [['de', '🇩🇪 Deutsch'], ['en', '🇬🇧 English']];
-const TARGET_NAMES = { id: { de: 'Indonesisch', en: 'Indonesian' }, en: { de: 'Englisch', en: 'English' } };
+const SOURCE_LANGS = [['de', '🇩🇪 Deutsch'], ['en', '🇬🇧 English'], ['id', '🇮🇩 Bahasa Indonesia']];
+const TARGET_NAMES = { id: { de: 'Indonesisch', en: 'Indonesian' }, en: { de: 'Englisch', en: 'English' }, de: { id: 'Bahasa Jerman', en: 'German' } };
 const currentSource = () => (window.U.TL.sources.length === 1 ? window.U.TL.sources[0] : LANG);
 const isCurrentCourse = o => o.target === window.U.TARGET && o.source === currentSource();
 function learnedIn(target) {
@@ -1404,10 +1411,10 @@ function courseSheet() {
         Speech.refresh();
         render(true);
         break;
-      case 'reminder': saveFile(LANG === 'en' ? 'indonesian-reminder.ics' : 'indonesisch-erinnerung.ics', reminderICS(), 'text/calendar'); break;
+      case 'reminder': saveFile(LANG === 'en' ? 'linguara-reminder.ics' : LANG === 'id' ? 'linguara-pengingat.ics' : 'linguara-erinnerung.ics', reminderICS(), 'text/calendar'); break;
       case 'export': {
         const d = new Date();
-        const name = `linguara-${window.U.TARGET === 'en' ? (LANG === 'en' ? 'english' : 'englisch') : (LANG === 'en' ? 'indonesian' : 'indonesisch')}-${LANG === 'en' ? 'backup' : 'sicherung'}-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}.json`;
+        const name = `linguara-${{ id: { de: 'indonesisch', en: 'indonesian' }, en: { de: 'englisch' }, de: { id: 'jerman', en: 'german' } }[window.U.TARGET][LANG]}-${{ de: 'sicherung', en: 'backup', id: 'cadangan' }[LANG]}-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}.json`;
         saveFile(name, St.exportData(), 'application/json');
         break;
       }
@@ -1499,5 +1506,51 @@ function courseSheet() {
     if (!session && tab === 'home') render(true);
   });
 
-  render();
+  // ---------- Zugang ----------
+  // Wer die Seite im Internet zum ersten Mal im Browser öffnet, braucht das Passwort. Die
+  // installierte App fragt nie, ebenso wenig Geräte, auf denen schon gelernt wurde. Im Code
+  // steht nur die SHA-256-Prüfsumme des Passworts.
+  const GATE_HASH = 'be466816b0c23325aef3356d07fdf50c29a3f5c16ace62bc7b2c39855d6012f0';
+  const UNLOCK_KEY = 'linguara.unlocked';
+  function needsGate() {
+    if (!/github\.io$/i.test(location.hostname) || standalone()) return false;
+    try {
+      if (localStorage.getItem(UNLOCK_KEY)) return false;
+      return !Object.values(window.U.TARGETS).some(tg => {
+        const s = JSON.parse(localStorage.getItem(tg.key) || 'null');
+        return s && s.cards && Object.keys(s.cards).length;
+      });
+    } catch (e) { return true; }
+  }
+  async function sha256(s) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  function showGate() {
+    gateOpen = true;
+    app.innerHTML = `<main class="page gate">
+      <img class="gate-logo" src="icon-192.png?v=4" alt="">
+      <h1>Linguara</h1>
+      <p class="muted">${t('Bitte gib das Passwort ein, um die App zu öffnen.')}</p>
+      <form class="gate-form">
+        <input type="password" autocomplete="current-password" placeholder="${t('Passwort')}" aria-label="${t('Passwort')}" required>
+        <button class="btn primary" type="submit">${t('Öffnen')}</button>
+      </form>
+    </main>`;
+    const form = app.querySelector('.gate-form'), input = form.querySelector('input');
+    form.onsubmit = async e => {
+      e.preventDefault();
+      if (await sha256(input.value.trim()) === GATE_HASH) {
+        try { localStorage.setItem(UNLOCK_KEY, '1'); } catch (err) { /* privater Modus – dann eben beim nächsten Mal wieder */ }
+        gateOpen = false;
+        render();
+      } else {
+        input.value = '';
+        input.focus();
+        toast(t('Das Passwort stimmt leider nicht.'));
+      }
+    };
+  }
+
+  if (needsGate()) showGate(); else render();
 })();

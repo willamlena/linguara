@@ -9,6 +9,10 @@ Offline-Web-App (PWA) zum täglichen Sprachenlernen. Läuft auf iPhone und Andro
 | 🇮🇩 Indonesisch – von Deutsch aus | 84 Themen, ca. 2.150 Karten, 64 Grammatik-Lektionen, 25 Gespräche |
 | 🇮🇩 Indonesian – from English | derselbe Kurs mit englischer Oberfläche und Übersetzungen |
 | 🇬🇧 Englisch – von Deutsch aus | 84 Themen, ca. 2.300 Karten, 69 Grammatik-Lektionen, 25 internationale Gespräche; britisches Englisch, amerikanische Varianten als „US“ |
+| 🇩🇪 Bahasa Jerman – dari bahasa Indonesia | Deutschkurs mit indonesischer Oberfläche: 84 Themen, ca. 2.150 Karten, 70 Grammatik-Lektionen, 25 Gespräche (Alltag, Arbeit im DACH-Raum, Ämter, Beziehungen); neutrales Standarddeutsch |
+| 🇩🇪 German – from English | derselbe Deutschkurs mit englischer Oberfläche |
+
+**Passwort:** Wer die Seite auf github.io zum ersten Mal im Browser öffnet, braucht das Passwort (im Code steht nur die SHA-256-Prüfsumme, `GATE_HASH` in `app.js`). Die installierte App und Geräte mit Lernstand fragen nie. Das ist ein Türschild, kein echter Schutz – die Dateien sind öffentlich.
 
 Jede **Lernsprache hat ihren eigenen Lernstand** – Indonesisch bleibt gleich, egal ob von Deutsch oder Englisch aus gelernt. Menüs und Erklärungen erscheinen in der Ausgangssprache.
 
@@ -61,6 +65,7 @@ Jede **Lernsprache hat ihren eigenen Lernstand** – Indonesisch bleibt gleich, 
 - **Grammatik:** `grammar.js` / `grammar2.js` (kleines Markup, Beschreibung oben in der Datei)
 - **Gespräche:** `dialogs.js` (Format oben in der Datei beschrieben)
 - **Englischkurs:** `english-vocab.js` / `english-vocab2.js` (Zeile: `englisch | deutsch | US-Variante | Beispiel | Übersetzung | Hinweis`), `english-grammar.js` / `english-grammar2.js`, `english-dialogs.js` – gleiches Format wie oben
+- **Deutschkurs:** `german-vocab.js` / `german-vocab2.js` (Zeile: `deutsch | indonesisch | englisch | umgangssprachlich | Beispiel DE | Beispiel ID | Beispiel EN | Hinweis ID | Hinweis EN`), `german-grammar*.js` (body je Sprache), `german-dialogs.js` – Texte für Lernende als „indonesisch ¦ englisch“
 - **Neue Sprache:** in `util.js` unter `TARGETS` eintragen, Inhaltsdateien anlegen und in `app.js` bei `COURSE_OPTIONS` ergänzen
 - **Eigene Wörter** lassen sich auch direkt in der App hinzufügen (Wörter → **+**).
 
@@ -73,7 +78,8 @@ Jede **Lernsprache hat ihren eigenen Lernstand** – Indonesisch bleibt gleich, 
 | `dialogs.js` | Gespräche für den Gesprächstrainer |
 | `english-vocab.js`, `english-vocab2.js`, `english-grammar.js`, `english-grammar2.js`, `english-dialogs.js` | Englischkurs (Deutsch → Englisch) |
 | `vocab.en.js`, `vocab2.en.js`, `grammar.en.js`, `grammar2.en.js`, `dialogs.en.js` | Englische Fassung der Inhalte (zugeordnet über das indonesische Wort bzw. die Lektions- und Gesprächs-ID) |
-| `i18n.en.js` | Englische Texte der Oberfläche (Schlüssel = deutscher Text) |
+| `i18n.en.js`, `i18n.id.js` | Englische und indonesische Texte der Oberfläche (Schlüssel = deutscher Text) |
+| `german-vocab.js`, `german-vocab2.js`, `german-grammar.js`, `german-grammar2.js`, `german-dialogs.js` | Deutschkurs (dreisprachig: Deutsch, Indonesisch, Englisch) |
 | `talk.js` | Gesprächstrainer, Antwortprüfung, Suche „Situation schildern“ |
 | `srs.js` | Wiederholungs-Algorithmus (FSRS-4.5 + persönlicher Gedächtnis-Faktor) |
 | `store.js` | Lernstand, Tagesplanung, Anpassung ans Tempo |

@@ -1,7 +1,24 @@
 // English user interface. Key = German text in the code (t('…')), value = English text.
 // {n}, {a}, … are placeholders that the app fills in.
 window.UI_EN = {
+  "Bitte gib das Passwort ein, um die App zu öffnen.": "Please enter the password to open the app.",
+  "Passwort": "Password",
+  "Das Passwort stimmt leider nicht.": "Sorry, that password isn't right.",
   "Sprachen": "Languages",
+  // Deutschkurs (Texte, die dort anders lauten)
+  "Du hast alle {n} Karten der Grundlagen gelernt. Ab jetzt geht es mit <b>Level 2 – Fortgeschritten</b> weiter: Leben im Ausland, Beruf, Umgangssprache und eigene Meinungen.": "You've learned all {n} cards of the basics. From now on you continue with <b>Level 2 – Advanced</b>: life abroad, work, colloquial speech and your own opinions.",
+  "B1–B2 · Leben im Ausland, Beruf, Umgangssprache, Meinungen": "B1–B2 · Life abroad, work, colloquial speech, opinions",
+  "Ding, Ort oder Person – mit Artikel, z. B. der Strand, die Kokosnuss": "Thing, place or person – with its article, e.g. der Strand, die Kokosnuss",
+  "Tätigkeit – in der Grundform, z. B. schwimmen": "Action – in the base form, e.g. schwimmen",
+  "Eigenschaft – z. B. frisch, gemütlich": "Quality – e.g. frisch, gemütlich",
+  "z. B. die Kokosnuss": "e.g. die Kokosnuss",
+  "z. B. Ich trinke gern Kokoswasser.": "e.g. Ich trinke gern Kokoswasser.",
+  "z. B. Saya suka minum air kelapa.": "e.g. I like drinking coconut water.",
+  "In welcher Stadt lebst du?": "Which city do you live in?",
+  "z. B. Wien, Berlin, Zürich": "e.g. Vienna, Berlin, Zurich",
+  "Umgangssprachliche Formen zeigen": "Show colloquial forms",
+  "z. B. habe → hab, nein → nee": "e.g. habe → hab, nein → nee",
+  "Umgangssprache": "Colloquial",
   "Ich spreche": "I speak",
   "Ich lerne": "I'm learning",
   "Kurs wechseln": "Switch course",
