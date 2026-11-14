@@ -317,7 +317,12 @@
       let done = false;
       const finish = () => { if (!done) { done = true; if (opts.onend) opts.onend(); } };
       if (!this.supported || !text) { setTimeout(finish, 0); return; }
-      if (this.missing) { if (this.onMissing) this.onMissing(); setTimeout(finish, 0); return; }
+      if (this.missing) {
+        if (this.onMissing) this.onMissing();
+        // Indonesisch: lieber still als mit einer falschen Stimme. Deutsch und Englisch kann fast
+        // jede Sprachausgabe – oft auch, wenn das Handy die Stimme nicht meldet (wird nachgeladen).
+        if (TARGET === 'id') { setTimeout(finish, 0); return; }
+      }
       const set = window.Store.S.settings;
       const clean = speakable(text);
       const u = new SpeechSynthesisUtterance(clean);
