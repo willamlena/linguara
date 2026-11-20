@@ -5,6 +5,8 @@ window.UI_EN = {
   "Passwort": "Password",
   "Das Passwort stimmt leider nicht.": "Sorry, that password isn't right.",
   "Sprachen": "Languages",
+  "Immer Online-Stimme verwenden": "Always use the online voice",
+  "Mit Internet liest eine Google-Stimme vor – hilft, wenn die Stimme am Handy falsch klingt. Fehlt am Handy eine passende Stimme, passiert das automatisch.": "With internet, a Google voice reads aloud – helps if your phone's voice sounds wrong. If your phone has no suitable voice, this happens automatically.",
   // Deutschkurs (Texte, die dort anders lauten)
   "Du hast alle {n} Karten der Grundlagen gelernt. Ab jetzt geht es mit <b>Level 2 – Fortgeschritten</b> weiter: Leben im Ausland, Beruf, Umgangssprache und eigene Meinungen.": "You've learned all {n} cards of the basics. From now on you continue with <b>Level 2 – Advanced</b>: life abroad, work, colloquial speech and your own opinions.",
   "B1–B2 · Leben im Ausland, Beruf, Umgangssprache, Meinungen": "B1–B2 · Life abroad, work, colloquial speech, opinions",

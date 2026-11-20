@@ -316,19 +316,62 @@
       opts = opts || {};
       let done = false;
       const finish = () => { if (!done) { done = true; if (opts.onend) opts.onend(); } };
-      if (!this.supported || !text) { setTimeout(finish, 0); return; }
+      if (!text) { setTimeout(finish, 0); return; }
+      const set = window.Store.S.settings;
+      const clean = speakable(text);
+      const rate = Math.max(0.4, set.rate * (opts.slow ? 0.7 : 1));
+      // Online-Stimme (Google), wenn Internet da ist und am Handy keine passende Stimme ist –
+      // oder wenn sie in den Einstellungen immer gewünscht ist. Klappt sie nicht: Handy-Stimme.
+      const online = typeof navigator === 'undefined' || navigator.onLine !== false;
+      if (online && (!this.supported || !this.voices.length || set.onlineVoice)) {
+        // Sicherheitsnetz, falls das Laden hängt (z. B. schwaches Netz)
+        if (opts.onend) setTimeout(finish, 4000 + clean.length * 150 / rate);
+        this.speakOnline(clean, rate, finish, () => this.speakDevice(clean, rate, finish, opts));
+        return;
+      }
+      this.speakDevice(clean, rate, finish, opts);
+    },
+    // Aussprache von Google (wie im Google Übersetzer) – Stücke à max. 180 Zeichen nacheinander
+    speakOnline(clean, rate, finish, fallback) {
+      this.stop();
+      const tl = { id: 'id', de: 'de', en: 'en-GB' }[TARGET] || TL.code;
+      const parts = (clean.match(/[^.!?;,]+[.!?;,]*\s*/g) || [clean]).reduce((acc, p) => {
+        const last = acc[acc.length - 1];
+        if (last && (last + p).length <= 180) acc[acc.length - 1] = last + p; else acc.push(p.slice(0, 180));
+        return acc;
+      }, []).map(p => p.trim()).filter(Boolean);
+      const a = this.audio || (this.audio = new Audio());
+      let i = 0, started = false, failed = false;
+      const fail = () => {
+        if (failed) return;
+        failed = true;
+        a.onended = a.onerror = null;
+        if (started) finish(); else fallback();
+      };
+      const next = () => {
+        if (i >= parts.length) { a.onended = a.onerror = null; finish(); return; }
+        a.src = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=' + tl + '&q=' + encodeURIComponent(parts[i++]);
+        a.playbackRate = Math.min(1.3, Math.max(0.5, rate / 0.9)); // 0.9 = normales Tempo der App
+        const p = a.play();
+        if (p && p.then) p.then(() => { started = true; }).catch(fail); else started = true;
+      };
+      a.onended = next;
+      a.onerror = fail;
+      next();
+    },
+    // Sprachausgabe des Handys
+    speakDevice(clean, rate, finish, opts) {
+      if (!this.supported) { setTimeout(finish, 0); return; }
       if (this.missing) {
         if (this.onMissing) this.onMissing();
         // Indonesisch: lieber still als mit einer falschen Stimme. Deutsch und Englisch kann fast
         // jede Sprachausgabe – oft auch, wenn das Handy die Stimme nicht meldet (wird nachgeladen).
         if (TARGET === 'id') { setTimeout(finish, 0); return; }
       }
-      const set = window.Store.S.settings;
-      const clean = speakable(text);
       const u = new SpeechSynthesisUtterance(clean);
       const v = this.current;
       if (v) { u.voice = v; u.lang = v.lang.replace('_', '-'); } else u.lang = TL.bcp;
-      u.rate = Math.max(0.4, set.rate * (opts.slow ? 0.7 : 1));
+      u.rate = rate;
       u.onend = finish;
       u.onerror = finish;
       // Sicherheitsnetz: manche Handys melden das Ende nicht
@@ -339,7 +382,10 @@
         setTimeout(go, 80); // iOS verschluckt sonst manchmal die Ausgabe
       } else go();
     },
-    stop() { if (this.supported) speechSynthesis.cancel(); },
+    stop() {
+      if (this.audio) { this.audio.onended = this.audio.onerror = null; this.audio.pause(); }
+      if (this.supported) speechSynthesis.cancel();
+    },
   };
 
   // ---------- Spracherkennung (Mikrofon) ----------

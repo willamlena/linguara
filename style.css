@@ -1,55 +1,70 @@
 /* ---------- Farben & Grundwerte ---------- */
 :root {
-  --bg: #F5F9F3;
-  --surface: #FFFFFF;
-  --surface-2: #EAF2E6;
-  --text: #22301F;
-  --muted: #6F7F6B;
-  --line: #DCE8D7;
-  --accent: #8DB88A;        /* Pastellgrün für Flächen: Knöpfe, Balken, Ring */
-  --accent-ink: #1E2E1C;    /* Schrift auf Pastellgrün */
-  --accent-soft: #E3F0DF;
-  --accent-text: #4A8547;   /* kräftigeres Grün für Schrift und Symbole – gut lesbar */
-  --ok: #3F8F4A;
-  --ok-soft: #DDF1DF;
-  --bad: #C2553A;
-  --bad-soft: #FBE6DF;
-  --meh: #A6761A;
-  --meh-soft: #FAF0D6;
-  --flame: #E8A07A;
-  --s1: #EBC47A;
-  --s2: #C9E0C6;
-  --s3: #9CC499;
-  --s4: #6FA36C;
-  --shadow: 0 1px 2px rgba(40, 60, 40, .06), 0 4px 16px rgba(40, 60, 40, .05);
-  --radius: 20px;
+  --bg: #F3EDE3;            /* warmes Creme */
+  --surface: #FBF8F2;
+  --surface-2: #ECE5D8;
+  --text: #2D2B25;
+  --muted: #877F72;
+  --line: #E3DACB;
+  --accent: #9DB592;        /* Salbeigrün für Balken, Ring */
+  --accent-ink: #1F2A1C;
+  --accent-soft: #E4E9D8;
+  --accent-text: #4F7348;
+  --brand: #2F5A2D;         /* Waldgrün wie im Icon – Hauptknöpfe */
+  --brand-ink: #FBF8F2;
+  --terra: #E08A63;         /* Terrakotta */
+  --terra-soft: #F6DFD2;
+  --mustard: #DDAE4F;       /* Senfgelb */
+  --mustard-soft: #F5E8C8;
+  --ok: #4C8A4F;
+  --ok-soft: #DFEBD6;
+  --bad: #C15A3E;
+  --bad-soft: #F7E1D7;
+  --meh: #A57824;
+  --meh-soft: #F5E9CC;
+  --flame: #E08A63;
+  --s1: #E6BF6E;
+  --s2: #CFDCC2;
+  --s3: #A2BD95;
+  --s4: #6E9365;
+  --shadow: 0 2px 6px rgba(90, 70, 40, .05), 0 12px 32px rgba(90, 70, 40, .08);
+  --shadow-sm: 0 1px 3px rgba(90, 70, 40, .06), 0 6px 16px rgba(90, 70, 40, .07);
+  --radius: 26px;
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --serif: ui-serif, "New York", "Iowan Old Style", "Palatino", Georgia, "Noto Serif", "Droid Serif", serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #131915;
-    --surface: #1B231D;
-    --surface-2: #243026;
-    --text: #E8F0E6;
-    --muted: #9AAA97;
-    --line: #2D3A2F;
-    --accent: #9CC99A;
-    --accent-ink: #142014;
-    --accent-soft: #233628;
-    --accent-text: #A8D6A5;
-    --ok: #7FCF86;
-    --ok-soft: #1E3522;
-    --bad: #F0957A;
-    --bad-soft: #3D2620;
+    --bg: #1A1C17;
+    --surface: #23261F;
+    --surface-2: #2E3229;
+    --text: #EEE8DC;
+    --muted: #A59D8F;
+    --line: #363A31;
+    --accent: #A9C29D;
+    --accent-ink: #1A2417;
+    --accent-soft: #2D3828;
+    --accent-text: #B5D2A8;
+    --brand: #B5D2A8;
+    --brand-ink: #1A2417;
+    --terra: #EC9C78;
+    --terra-soft: #42291F;
+    --mustard: #E8C26A;
+    --mustard-soft: #3B321B;
+    --ok: #8FCB8C;
+    --ok-soft: #22341F;
+    --bad: #F0987C;
+    --bad-soft: #3E2720;
     --meh: #E8C25A;
     --meh-soft: #3A3218;
-    --flame: #F0A981;
+    --flame: #EC9C78;
     --s1: #C9A24E;
-    --s2: #4E6E4F;
-    --s3: #6E9C6C;
-    --s4: #9CC99A;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+    --s2: #4E6249;
+    --s3: #77976C;
+    --s4: #A9C29D;
+    --shadow: 0 2px 8px rgba(0, 0, 0, .25), 0 12px 32px rgba(0, 0, 0, .2);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, .3);
     color-scheme: dark;
   }
 }
@@ -780,3 +795,96 @@ body.in-session { overflow: hidden; }
 .gate-form { display: grid; gap: 10px; width: 100%; max-width: 300px; }
 .gate-form input { min-height: 48px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--surface); padding: 0 14px; font-size: 16px; text-align: center; }
 .gate-form input:focus-visible { outline: none; border-color: var(--accent); }
+
+/* ======================================================================
+   Design 2026 – warmes Creme, weiche Karten, Serifen-Überschriften
+   (überschreibt die Grundformen oben)
+   ====================================================================== */
+h1, h2, .greet, .unit-title, .big-num, .fb-title, .trainer-hero h2 {
+  font-family: var(--serif); font-weight: 600; letter-spacing: -.01em;
+}
+h1 { font-size: 30px; }
+h2 { font-size: 24px; }
+.greet { font-size: 30px; line-height: 1.15; }
+.label { color: var(--accent-text); letter-spacing: .08em; }
+
+.page { padding-bottom: calc(env(safe-area-inset-bottom) + 118px); }
+
+/* Karten: groß gerundet, weicher Schatten, kein harter Rand */
+.card { border-radius: var(--radius); padding: 22px; margin-bottom: 16px; box-shadow: var(--shadow); }
+.unit-row, .search, .mini-stat { box-shadow: var(--shadow-sm); }
+.unit-row { border-radius: 22px; padding: 16px 18px; }
+.mini-stat { border-radius: 22px; }
+
+/* Knöpfe: runde Pillenform */
+.btn { border-radius: 999px; padding: 0 22px; letter-spacing: .005em; }
+.btn.big { border-radius: 999px; }
+.btn.sm { border-radius: 999px; padding: 0 14px; }
+.btn.primary { background: var(--brand); color: var(--brand-ink); box-shadow: 0 6px 16px color-mix(in srgb, var(--brand) 28%, transparent); }
+.btn.ghost { background: var(--surface-2); }
+
+/* Runde Symbol-Knöpfe wie in den Vorlagen */
+.icon-btn { background: var(--surface); box-shadow: var(--shadow-sm); }
+.icon-btn:active { background: var(--surface-2); }
+.topbar-actions { display: flex; gap: 8px; }
+.banner .icon-btn, .stepper .icon-btn { box-shadow: none; }
+
+/* Schwebende Pillen-Navigation */
+.tabbar {
+  left: 14px; right: 14px; bottom: calc(env(safe-area-inset-bottom) + 12px);
+  max-width: 532px; margin: 0 auto;
+  border: 0; border-radius: 999px; padding: 6px 8px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: 0 10px 30px rgba(70, 55, 30, .14), 0 2px 6px rgba(70, 55, 30, .06);
+}
+.nav-item { border-radius: 999px; padding: 7px 0 6px; font-size: 10.5px; transition: background .2s, color .2s; }
+.nav-item.active { color: var(--brand); background: var(--accent-soft); }
+
+/* Startseite */
+.hero-art { margin: -22px -22px 14px; height: 108px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; background: var(--mustard-soft); }
+.hero-art svg { display: block; width: 100%; height: 100%; }
+.hero-art .h-sun { fill: var(--mustard); }
+.hero-art .h-far { fill: var(--s2); }
+.hero-art .h-mid { fill: var(--s3); }
+.hero-art .h-near { fill: var(--s4); }
+.hero-art .h-terra { fill: var(--terra); }
+.hero-art .h-tree { fill: var(--brand); }
+.ring-bg { stroke: var(--surface-2); }
+.ring-fg { stroke: var(--brand); }
+.ring-wrap span { font-family: var(--serif); font-size: 17px; }
+.step.now .step-card { background: var(--accent-soft); border-radius: 20px; }
+.step.now .step-num { background: var(--brand); color: var(--brand-ink); }
+.step.next .step-card { border-radius: 20px; }
+.unit-icon { border-radius: 50%; background: var(--terra-soft); }
+.mini-stat b { font-family: var(--serif); font-weight: 600; }
+.flame.on { color: var(--terra); }
+
+/* Listen & Felder */
+.unit-row.current .unit-num { background: var(--brand); color: var(--brand-ink); }
+.lesson-link { border-radius: 20px; background: var(--mustard-soft); }
+.lesson-link .ic { color: var(--meh); }
+.search { border-radius: 999px; padding: 0 6px 0 18px; }
+.chip-btn { border-color: transparent; background: var(--surface); box-shadow: var(--shadow-sm); }
+.chip-btn.active { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.toggle-row input:checked + .switch { background: var(--brand); }
+.switch::after { background: var(--surface); }
+.bar { height: 7px; background: var(--surface-2); }
+.toggle-btn.on { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.deck span { background: var(--accent); border-color: var(--accent); }
+input[type=time], select { border-radius: 14px; }
+/* Tageszeiten der Startseiten-Landschaft */
+.hero-art { background: none; }
+.hero-art .h-far { fill: #CFDCC2; }
+.hero-art .h-mid { fill: #A2BD95; }
+.hero-art .h-near { fill: #6E9365; }
+.hero-art .h-tree { fill: #2F5A2D; }
+.hero-art .h-terra { fill: #E08A63; }
+.t-evening .h-far { fill: #D9C9A6; }
+.t-evening .h-mid { fill: #A9AE85; }
+.t-evening .h-near { fill: #6F7F55; }
+.t-night .h-far { fill: #4C5E62; }
+.t-night .h-mid { fill: #3C5048; }
+.t-night .h-near { fill: #2C3D33; }
+.t-night .h-tree { fill: #1C2A20; }
+.t-night .h-terra { fill: #8E5A45; }
+@media (prefers-color-scheme: dark) { .hero-art:not(.t-night) svg { filter: brightness(.86) saturate(.9); } }

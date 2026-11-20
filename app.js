@@ -49,6 +49,33 @@
   const plural = (n, one, many) => (n === 1 ? t('1 ' + one) : t('{n} ' + many, { n }));
 
   // ---------- Startseite ----------
+  // Landschaft auf der Startseite – passend zur Tageszeit
+  function heroArt(hour) {
+    const h = hour == null ? new Date().getHours() : hour;
+    const phase = h >= 5 && h < 11 ? 'morning' : h >= 11 && h < 17 ? 'day' : h >= 17 && h < 21 ? 'evening' : 'night';
+    const sky = { morning: ['#F9DCC8', '#FBEEDC'], day: ['#F3E3B8', '#F8EFD6'], evening: ['#E9A47F', '#F6D3A6'], night: ['#26344A', '#46566B'] }[phase];
+    const orb = {
+      morning: '<circle cx="104" cy="50" r="17" fill="#F2A97F"/><circle cx="104" cy="50" r="27" fill="#F2A97F" opacity=".18"/>',
+      day: '<circle cx="318" cy="34" r="19" fill="#DDAE4F"/><circle cx="318" cy="34" r="30" fill="#DDAE4F" opacity=".16"/>',
+      evening: '<circle cx="300" cy="66" r="24" fill="#E07A55"/><circle cx="300" cy="66" r="36" fill="#E07A55" opacity=".18"/>',
+      night: '<path d="M326 22 a17 17 0 1 0 14 27 a14 14 0 1 1 -14 -27z" fill="#F4EBD3"/>' +
+        [[40,20],[96,34],[150,16],[210,30],[262,14],[372,30],[120,52],[236,50]].map(([x, y], i) =>
+          `<circle cx="${x}" cy="${y}" r="${i % 3 ? 1.3 : 1.9}" fill="#F4EBD3" opacity="${i % 2 ? .6 : .9}"/>`).join('')
+    }[phase];
+    const lit = phase === 'night' || phase === 'evening';
+    return `<div class="hero-art t-${phase}" aria-hidden="true"><svg viewBox="0 0 400 108" preserveAspectRatio="xMidYMax slice">
+      <defs><linearGradient id="hsky-${phase}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs>
+      <rect width="400" height="108" fill="url(#hsky-${phase})"/>
+      ${orb}
+      <path class="h-far" d="M0 70 C60 44 110 50 160 62 S260 40 320 56 S380 60 400 54 V108 H0Z"/>
+      <path class="h-mid" d="M0 84 C50 66 100 70 150 80 S250 64 300 76 S370 82 400 74 V108 H0Z"/>
+      <g class="h-tree"><path d="M62 82 l9 -24 l9 24z"/><path d="M80 84 l7 -18 l7 18z"/><path d="M236 76 l8 -21 l8 21z"/></g>
+      <g class="h-terra"><path d="M168 76 h22 v-12 l-11 -9 l-11 9z"/></g>
+      <rect x="176" y="66" width="6" height="6" rx="1" fill="${lit ? '#F6D27A' : '#B9694A'}"/>
+      <path class="h-near" d="M0 96 C70 84 130 88 200 94 S330 86 400 92 V108 H0Z"/>
+    </svg></div>`;
+  }
+
   function greeting() {
     const h = new Date().getHours();
     const g = window.U.TL.greet;
@@ -79,9 +106,10 @@
     const learnedAny = vc.words + vc.sentences >= 5;
     const lesson = unit.lesson && window.LESSONS[unit.lesson];
 
+  const HERO_ART = heroArt();
     let today;
     if (p.done) {
-      today = `
+      today = HERO_ART + `
         <div class="today-done">
           <div class="big-emoji">${p.courseDone ? '🏆' : '✅'}</div>
           <h2>${p.courseDone ? t('Kurs abgeschlossen!') : t('Geschafft für heute!')}</h2>
@@ -117,7 +145,7 @@
             </div>
           </div>`;
       };
-      today = `
+      today = HERO_ART + `
         <div class="today-row">
           <div class="ring-wrap">${ring(p.progress)}<span>${Math.round(p.progress * 100)}%</span></div>
           <div>
@@ -961,6 +989,7 @@ function courseSheet() {
         <h3>${t('Aussprache')}</h3>
         ${voiceCardHTML()}
         ${toggle('autoplay', t('Automatisch vorlesen'), t('Neue Wörter und Antworten werden vorgesprochen'))}
+        ${toggle('onlineVoice', t('Immer Online-Stimme verwenden'), t('Mit Internet liest eine Google-Stimme vor – hilft, wenn die Stimme am Handy falsch klingt. Fehlt am Handy eine passende Stimme, passiert das automatisch.'))}
         <label class="field-row"><span>${t('Sprechtempo')}</span><input type="range" min="0.6" max="1.2" step="0.05" value="${set.rate}" data-range="rate" aria-label="${t('Sprechtempo')}"></label>
         <div class="range-labels"><span>${t('langsamer')}</span><span>${t('schneller')}</span></div>
         ${voices.length > 1 ? `
@@ -1460,7 +1489,7 @@ function courseSheet() {
   };
   let voiceState = '';
   Speech.listeners.push(() => {
-    document.body.classList.toggle('no-voice', Speech.missing);
+    document.body.classList.toggle('no-voice', Speech.missing && navigator.onLine === false);
     // Assistent lief und die Stimme ist jetzt da → Erfolg melden
     if (St.S.ui.voiceWizard && Speech.available) {
       St.S.ui.voiceWizard = false;

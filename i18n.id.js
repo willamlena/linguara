@@ -5,6 +5,8 @@ window.UI_ID = {
   "Passwort": "Kata sandi",
   "Das Passwort stimmt leider nicht.": "Maaf, kata sandinya salah.",
   "Sprachen": "Bahasa",
+  "Immer Online-Stimme verwenden": "Selalu pakai suara online",
+  "Mit Internet liest eine Google-Stimme vor – hilft, wenn die Stimme am Handy falsch klingt. Fehlt am Handy eine passende Stimme, passiert das automatisch.": "Jika ada internet, suara Google yang membacakan – membantu kalau suara di HP terdengar salah. Kalau HP tidak punya suara yang cocok, ini terjadi otomatis.",
   "Ich spreche": "Saya bicara",
   "Ich lerne": "Saya belajar",
   "Kurs wechseln": "Ganti kursus",

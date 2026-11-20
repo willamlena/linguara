@@ -79,6 +79,7 @@
       colloquial: true, autoplay: true, typing: true,
       rate: 0.9, voice: '', reminder: '19:00',
       handsFree: false, dialogDe: false,
+      onlineVoice: false, // immer die Online-Stimme nehmen, wenn Internet da ist
       lang: window.U.LANG, // Sprache der App: 'de' oder 'en'
     },
     learner: { m: 1, base: 10 },
