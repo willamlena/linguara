@@ -49,31 +49,11 @@
   const plural = (n, one, many) => (n === 1 ? t('1 ' + one) : t('{n} ' + many, { n }));
 
   // ---------- Startseite ----------
-  // Landschaft auf der Startseite – passend zur Tageszeit
+  // Landschaft auf der Startseite – passend zu Kurs und Tageszeit, mit den Bewohnern von „Dein Tal“
   function heroArt(hour) {
     const h = hour == null ? new Date().getHours() : hour;
     const phase = h >= 5 && h < 11 ? 'morning' : h >= 11 && h < 17 ? 'day' : h >= 17 && h < 21 ? 'evening' : 'night';
-    const sky = { morning: ['#F9DCC8', '#FBEEDC'], day: ['#F3E3B8', '#F8EFD6'], evening: ['#E9A47F', '#F6D3A6'], night: ['#26344A', '#46566B'] }[phase];
-    const orb = {
-      morning: '<circle cx="104" cy="50" r="17" fill="#F2A97F"/><circle cx="104" cy="50" r="27" fill="#F2A97F" opacity=".18"/>',
-      day: '<circle cx="318" cy="34" r="19" fill="#DDAE4F"/><circle cx="318" cy="34" r="30" fill="#DDAE4F" opacity=".16"/>',
-      evening: '<circle cx="300" cy="66" r="24" fill="#E07A55"/><circle cx="300" cy="66" r="36" fill="#E07A55" opacity=".18"/>',
-      night: '<path d="M326 22 a17 17 0 1 0 14 27 a14 14 0 1 1 -14 -27z" fill="#F4EBD3"/>' +
-        [[40,20],[96,34],[150,16],[210,30],[262,14],[372,30],[120,52],[236,50]].map(([x, y], i) =>
-          `<circle cx="${x}" cy="${y}" r="${i % 3 ? 1.3 : 1.9}" fill="#F4EBD3" opacity="${i % 2 ? .6 : .9}"/>`).join('')
-    }[phase];
-    const lit = phase === 'night' || phase === 'evening';
-    return `<div class="hero-art t-${phase}" aria-hidden="true"><svg viewBox="0 0 400 108" preserveAspectRatio="xMidYMax slice">
-      <defs><linearGradient id="hsky-${phase}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs>
-      <rect width="400" height="108" fill="url(#hsky-${phase})"/>
-      ${orb}
-      <path class="h-far" d="M0 70 C60 44 110 50 160 62 S260 40 320 56 S380 60 400 54 V108 H0Z"/>
-      <path class="h-mid" d="M0 84 C50 66 100 70 150 80 S250 64 300 76 S370 82 400 74 V108 H0Z"/>
-      <g class="h-tree"><path d="M62 82 l9 -24 l9 24z"/><path d="M80 84 l7 -18 l7 18z"/><path d="M236 76 l8 -21 l8 21z"/></g>
-      <g class="h-terra"><path d="M168 76 h22 v-12 l-11 -9 l-11 9z"/></g>
-      <rect x="176" y="66" width="6" height="6" rx="1" fill="${lit ? '#F6D27A' : '#B9694A'}"/>
-      <path class="h-near" d="M0 96 C70 84 130 88 200 94 S330 86 400 92 V108 H0Z"/>
-    </svg></div>`;
+    return `<div class="hero-art t-${phase}" data-act="garden">${Garden.scene(window.U.TARGET, phase)}</div>${Garden.lineHTML()}`;
   }
 
   function greeting() {
@@ -358,7 +338,7 @@
     openSheet(`
       <div class="sheet-head"><h2>📘 ${esc(L.title)}</h2>${closeBtn()}</div>
       <article class="lesson">${lessonHTML(L)}</article>`);
-    if (!St.S.lessons[key] && !St.S.lessonsRead[key]) { St.S.lessonsRead[key] = Date.now(); St.save(); }
+    if (!St.S.lessons[key] && !St.S.lessonsRead[key]) { St.S.lessonsRead[key] = Date.now(); St.save(); ptsBefore = Garden.points() - 5; setTimeout(gardenAfter, 900); }
   }
 
   // „Level 2 · Thema 5“
@@ -1283,6 +1263,29 @@ function courseSheet() {
   let ignorePop = 0;
   function historyBack() { ignorePop++; history.back(); }
 
+  // ---------- Dein Tal (Punkte, Tiere, Gadgets) ----------
+  const Garden = window.Garden;
+  let ptsBefore = 0;
+  function gardenSheet() {
+    openSheet(`<div class="sheet-head"><h2>${t('Dein Tal')}</h2>${closeBtn()}</div>${Garden.collectionHTML()}`, Garden.fit);
+  }
+  // Nach einer Übung: Punkte zeigen und Neues im Tal vorstellen
+  function gardenAfter(first) {
+    if (session || gateOpen || document.querySelector('.sheet-backdrop')) return;
+    const wasEmpty = !(St.S.garden && St.S.garden.seen.length);
+    const fresh = Garden.takeFresh();
+    first = first === true && wasEmpty;
+    if (fresh.length) {
+      openSheet(`<div class="sheet-head"><h2>${first ? t('Dein Tal ist erwacht!') : t('Neu in deinem Tal!')}</h2>${closeBtn()}</div>
+        ${Garden.freshHTML(fresh, first)}
+        <button class="btn primary block mt" data-act="close-sheet">${t('Schön!')}</button>`, Garden.fit);
+      if (tab === 'home') render(true);
+      return;
+    }
+    const gained = Garden.points() - ptsBefore;
+    if (first !== true && gained > 0) toast(t('+{n} 🌱 für dein Tal', { n: gained }));
+  }
+
   // ---------- Lektion & Trainer starten ----------
   function enterSession(create) {
     if (!St.S.ui.welcomed) { St.S.ui.welcomed = true; St.save(); }
@@ -1294,10 +1297,12 @@ function courseSheet() {
     app.appendChild(root);
     history.pushState({ v: 'session' }, '');
     window.scrollTo(0, 0);
+    ptsBefore = Garden.points();
     session = create(root);
   }
   function exitSession() {
     session = null;
+    setTimeout(gardenAfter, 400);
     document.body.classList.remove('in-session');
     if (history.state && history.state.v === 'session') historyBack();
   }
@@ -1368,6 +1373,7 @@ function courseSheet() {
       case 'ask': ask.q = v; runAsk(v); break;
       case 'ask-clear': ask = { q: '', res: undefined }; render(true); break;
       case 'course-sheet': courseSheet(); break;
+      case 'garden': gardenSheet(); break;
       case 'course-go': {
         const p = a.closest('.course-pick');
         const o = { target: p.querySelector('[data-course=target]').value, source: p.querySelector('[data-course=source]').value };
@@ -1508,7 +1514,13 @@ function courseSheet() {
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').then(reg => {
-      const onWaiting = w => { swWaiting = w; if (!session && tab === 'home') render(true); };
+      // Neue Version bereit: ohne laufende Lektion gleich einspielen,
+      // sonst Hinweis „Eine neue Version ist da“ zeigen
+      const onWaiting = w => {
+        swWaiting = w;
+        if (!session) { w.postMessage('skipWaiting'); return; }
+        if (tab === 'home') render(true);
+      };
       if (reg.waiting && navigator.serviceWorker.controller) onWaiting(reg.waiting);
       reg.addEventListener('updatefound', () => {
         const w = reg.installing;
@@ -1558,7 +1570,7 @@ function courseSheet() {
   function showGate() {
     gateOpen = true;
     app.innerHTML = `<main class="page gate">
-      <img class="gate-logo" src="icon-192.png?v=4" alt="">
+      <img class="gate-logo" src="icon-192.png?v=5" alt="">
       <h1>Linguara</h1>
       <p class="muted">${t('Bitte gib das Passwort ein, um die App zu öffnen.')}</p>
       <form class="gate-form">
@@ -1581,5 +1593,6 @@ function courseSheet() {
     };
   }
 
-  if (needsGate()) showGate(); else render();
+  if (needsGate()) showGate(); else { render(); setTimeout(() => gardenAfter(true), 600); }
+  Garden.startLife();
 })();

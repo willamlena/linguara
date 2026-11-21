@@ -526,4 +526,17 @@ window.UI_ID = {
   "{n} Sätze": "{n} kalimat",
   "1 Wort": "1 kata",
   "{n} Wörter": "{n} kata",
+  // Dein Tal
+  "Dein Tal": "Lembahmu",
+  "Dein Tal ist erwacht!": "Lembahmu sudah bangun!",
+  "Neu in deinem Tal!": "Baru di lembahmu!",
+  "Schön!": "Asyik!",
+  "+{n} 🌱 für dein Tal": "+{n} 🌱 untuk lembahmu",
+  "Dein Tal ist voller Leben 🎉": "Lembahmu penuh kehidupan 🎉",
+  "Für jede Übung bekommst du 🌱 – ob Lektion, Vokabeln oder Gespräch. Ist der Balken voll, zieht eine Überraschung in dein Tal ein. Wer viele Tage hintereinander lernt, bekommt zusätzlich besondere Gäste.": "Setiap latihan memberimu 🌱 – pelajaran, kartu kosakata, atau percakapan. Kalau baloknya penuh, ada kejutan yang pindah ke lembahmu. Kalau kamu belajar berhari-hari berturut-turut, akan datang tamu istimewa juga.",
+  "Punkte": "poin",
+  "Tippe auf ein Tier, um seinen Namen zu hören.": "Ketuk hewan untuk mendengar namanya.",
+  "Noch ist dein Tal still … mach deine erste Übung!": "Lembahmu masih sepi … ayo mulai latihan pertamamu!",
+  "Weil du schon fleißig gelernt hast, sind diese Tiere und Dinge bei dir eingezogen:": "Karena kamu sudah rajin belajar, hewan dan benda ini sudah pindah ke lembahmu:",
+  "Für deine Übungen ist etwas Neues in dein Tal gekommen:": "Berkat latihanmu, ada sesuatu yang baru di lembahmu:",
 };

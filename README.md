@@ -81,6 +81,7 @@ Jede **Lernsprache hat ihren eigenen Lernstand** – Indonesisch bleibt gleich, 
 | `i18n.en.js`, `i18n.id.js` | Englische und indonesische Texte der Oberfläche (Schlüssel = deutscher Text) |
 | `german-vocab.js`, `german-vocab2.js`, `german-grammar.js`, `german-grammar2.js`, `german-dialogs.js` | Deutschkurs (dreisprachig: Deutsch, Indonesisch, Englisch) |
 | `talk.js` | Gesprächstrainer, Antwortprüfung, Suche „Situation schildern“ |
+| `garden.js` | „Dein Tal“: 🌱 Punkte für jede Übung, Tiere & Gadgets in der Startseiten-Landschaft (Überraschung, nichts geht verloren) |
 | `srs.js` | Wiederholungs-Algorithmus (FSRS-4.5 + persönlicher Gedächtnis-Faktor) |
 | `store.js` | Lernstand, Tagesplanung, Anpassung ans Tempo |
 | `session.js` | Lektion und Übungstypen |

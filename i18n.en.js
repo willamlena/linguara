@@ -539,4 +539,17 @@ window.UI_EN = {
   "{n} Sätze": "{n} sentences",
   "1 Wort": "1 word",
   "{n} Wörter": "{n} words",
+  // Dein Tal
+  "Dein Tal": "Your valley",
+  "Dein Tal ist erwacht!": "Your valley has woken up!",
+  "Neu in deinem Tal!": "New in your valley!",
+  "Schön!": "Lovely!",
+  "+{n} 🌱 für dein Tal": "+{n} 🌱 for your valley",
+  "Dein Tal ist voller Leben 🎉": "Your valley is full of life 🎉",
+  "Für jede Übung bekommst du 🌱 – ob Lektion, Vokabeln oder Gespräch. Ist der Balken voll, zieht eine Überraschung in dein Tal ein. Wer viele Tage hintereinander lernt, bekommt zusätzlich besondere Gäste.": "Every exercise earns you 🌱 – lessons, flashcards or conversations. When the bar is full, a surprise moves into your valley. Learn many days in a row and special guests will come too.",
+  "Punkte": "points",
+  "Tippe auf ein Tier, um seinen Namen zu hören.": "Tap an animal to hear its name.",
+  "Noch ist dein Tal still … mach deine erste Übung!": "Your valley is still quiet … do your first exercise!",
+  "Weil du schon fleißig gelernt hast, sind diese Tiere und Dinge bei dir eingezogen:": "Because you've already been learning so diligently, these animals and things have moved in:",
+  "Für deine Übungen ist etwas Neues in dein Tal gekommen:": "Thanks to your practice, something new has come to your valley:",
 };
